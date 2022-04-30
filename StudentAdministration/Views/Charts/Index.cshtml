@@ -1,0 +1,428 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card card-body">
+            <div class="media">
+              
+
+                <div class="media-body text-right">
+                    <h3 id="h_totalStudents" class="font-weight-semibold mb-0"></h3>
+                    <span class="text-uppercase font-size-xs text-muted">total Students</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-body">
+            <div class="media">
+              
+
+                <div class="media-body text-right">
+                    <h3 id="h_totalClasses" class="font-weight-semibold mb-0"></h3>
+                    <span class="text-uppercase font-size-xs text-muted">total Classes</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-body">
+            <div class="media">
+                <div class="media-body text-right">
+                    <h3 id="h_totalCountries" class="font-weight-semibold mb-0"></h3>
+                    <span class="text-uppercase font-size-xs text-muted">total Countries</span>
+                </div>
+
+              
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<br />
+<div class="col-md-12">
+    <div class="card" style="width: 100%;">
+        <div class="card-header bg-info-300">
+            <h3 class="card-title">Statistics:</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header header-elements-inline">
+                            <h4 class="card-title">C. Students Per Class</h4>
+                            <div class="header-elements">
+                                <div class="list-icons">
+                                    <a class="list-icons-item" data-action="collapse"></a>
+                                    <a class="list-icons-item" data-action="reload"></a>
+                                    <a class="list-icons-item" data-action="remove"></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="chart-container text-center">
+                                <div class="d-inline-block" id="chrStudentPerClass"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header header-elements-inline">
+                            <h4 class="card-title">C. Students Per Country</h4>
+                            <div class="header-elements">
+                                <div class="list-icons">
+                                    <a class="list-icons-item" data-action="collapse"></a>
+                                    <a class="list-icons-item" data-action="reload"></a>
+                                    <a class="list-icons-item" data-action="remove"></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="chart-container text-center">
+                                <div class="d-inline-block" id="chrStudentPerCountry"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header header-elements-inline">
+                            <h4 class="card-title">Average Age of students</h4>
+                            <div class="header-elements">
+                                <div class="list-icons">
+                                    <a class="list-icons-item" data-action="collapse"></a>
+                                    <a class="list-icons-item" data-action="reload"></a>
+                                    <a class="list-icons-item" data-action="remove"></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="chart-container text-center">
+                                <div class="d-inline-block" id="chrAverageAge"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header header-elements-inline">
+                            <h4 class="card-title">No. of Students Per Year</h4>
+                            <div class="header-elements">
+                                <div class="list-icons">
+                                    <a class="list-icons-item" data-action="collapse"></a>
+                                    <a class="list-icons-item" data-action="reload"></a>
+                                    <a class="list-icons-item" data-action="remove"></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="chart-container text-center">
+                                <div class="d-inline-block" id="chrReg"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+@section Scripts{
+
+    <script src="~/Scripts/c3.min.js"></script>
+    <script src="~/Scripts/d3.min.js"></script>
+
+
+    <script type="text/javascript">
+
+
+    $(document).ready(function ()  {
+
+        loadSummary();
+        loadCountStudentPerClass();
+        loadCountStudentPerCountry();
+        loadStudentAverageAge();
+        loadRegistration();
+    });
+
+
+    function loadSummary() {
+
+          let _url = '@Url.Action("loadDataSummary", "Charts")';
+        $.ajax({
+            url: _url,
+            type: "GET",
+            cache: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                try {
+
+                    if (response.Status == 1) {
+                        document.getElementById('h_totalStudents').innerHTML = response.ResponseText.tStudent;
+                        document.getElementById('h_totalClasses').innerHTML = response.ResponseText.tClass;
+                        document.getElementById('h_totalCountries').innerHTML = response.ResponseText.tCountries;
+
+                    }
+                }
+
+
+                catch (ex) {
+                    alert(ex);
+                }
+
+            },
+            error: function (response) {
+
+                alert(response.Message);
+            }
+        });
+
+    }
+
+
+    function loadCountStudentPerClass() {
+        let _url = '@Url.Action("CountStudentPerClass", "Charts")';
+        $.ajax({
+            url: _url,
+            type: "GET",
+            cache: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                try {
+
+                    var data = {};
+                    var ClassName = [];
+
+
+                    $.each(response.ResponseText, function (key, item) {
+                        ClassName.push(item.ClassName);
+                        data[item.ClassName] = item.Count;
+                    });
+
+
+                    var chart = c3.generate({
+                        bindto: '#chrStudentPerClass',
+                        data: {
+                            json: [data],
+                            keys: {
+                                value: ClassName,
+                            },
+                            type: 'pie'
+                        },
+                        color: {
+                            pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+                        },
+                        pie: {
+                            label: {
+                                format: function (value, ratio, id) {
+                                    return value;
+                                }
+                            }
+                        }
+                    });
+                }
+
+
+                catch (ex) {
+                    alert(ex);
+                }
+
+            },
+            error: function (response) {
+
+                alert(response.Message);
+            }
+        });
+    }
+
+    function loadCountStudentPerCountry() {
+        let _url = '@Url.Action("CountStudentPerCountry", "Charts")';
+        $.ajax({
+            url : _url,
+            type: "GET",
+            cache: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                try {
+
+
+                    var data = {};
+                    var CounntryName = [];
+
+
+                    $.each(response.ResponseText, function (key, item) {
+                        CounntryName.push(item.CounntryName);
+                        data[item.CounntryName] = item.Count;
+                    });
+
+
+                    var chart = c3.generate({
+                        bindto: '#chrStudentPerCountry',
+                        data: {
+                            json: [data],
+                            keys: {
+                                value: CounntryName,
+                            },
+                            type: 'pie'
+                        },
+                        color: {
+                            pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+                        },
+                        pie: {
+                            label: {
+                                format: function (value, ratio, id) {
+                                    return value;
+                                }
+                            }
+                        }
+                    });
+                }
+
+
+                catch (ex) {
+                    alert(ex);
+                }
+
+            },
+            error: function (response) {
+
+                alert(response.Message);
+            }
+        });
+    }
+
+    function loadStudentAverageAge() {
+         let _url = '@Url.Action("StudentAverageAge", "Charts")';
+        $.ajax({
+            url : _url,
+            type: "GET",
+            cache: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                try {
+                    var data = {};
+                    var Ages = [];
+                    
+                    $.each(response.ResponseText, function (key, item) {
+                        Ages.push(item.age);
+                        data[item.age] = item.count;
+                    });
+
+                    var chart = c3.generate({
+                        bindto: '#chrAverageAge',
+                        data: {
+                            json: [data],
+                            keys: {
+                                value: Ages,
+                            },
+                            columns: [Ages],
+                            type: 'bar',
+                           
+                        },
+
+                        color: {
+                            pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+                        },
+                    });
+                   
+                }
+
+
+                catch (ex) {
+                    alert(ex);
+                }
+
+            },
+            error: function (response) {
+
+                alert(response.Message);
+            }
+        });
+    }
+
+          function loadRegistration() {
+         let _url = '@Url.Action("RegistrationYears", "Charts")';
+        $.ajax({
+            url : _url,
+            type: "GET",
+            cache: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+              //  console.log(response);
+                try {
+                  
+                    var data = {};
+                    var Years = [];
+                    var count = [];
+                    Years.push('x');
+
+                    count.push('Registration Years');
+                    $.each(response.ResponseText, function (key, item) {
+                        Years.push(JSON.stringify(item.Year));
+                        count.push(item.Count);
+                        //data[item.Year] = item.Count;
+                       
+                    });
+                    console.log(Years);
+                    var chart = c3.generate({
+                        bindto: '#chrReg',
+                        data: {
+                            x: 'x',
+                            xFormat: '%Y',
+                            columns: [
+                                Years,
+                                count
+                               
+                            ]
+                            //,
+                            //axes: {
+                            //    data2: 'y2'
+                            //},
+
+                        },
+
+                       
+                    });
+                   
+                }
+
+
+                catch (ex) {
+                    alert(ex);
+                }
+
+            },
+            error: function (response) {
+
+                alert(response.Message);
+            }
+        });
+    }
+    </script>
+
+}
